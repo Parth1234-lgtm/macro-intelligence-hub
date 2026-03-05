@@ -66,7 +66,7 @@ export default function App() {
     if (sectorData[sector] || loading[sector]) return;
     setLoading(prev => ({ ...prev, [sector]: true }));
     try {
-      const res = await fetch(`/api/analyze/${encodeURIComponent(sector)}`);
+      const res = await fetch(`https://macro-intelligence-hub.onrender.com/api/analyze/${encodeURIComponent(sector)}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const d = await res.json();
       setSectorData(prev => ({ ...prev, [sector]: d }));
