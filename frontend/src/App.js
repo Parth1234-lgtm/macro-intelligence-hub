@@ -202,7 +202,7 @@ export default function App() {
             )}
 
             {/* Graph */}
-            <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderRadius:12, overflow:'hidden' }}>
+            <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderRadius:12 }}>
               <div style={{ padding:'14px 22px', borderBottom:'1px solid #1a1a1a', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <span style={{ fontSize:11, color:'#888', fontFamily:'JetBrains Mono', letterSpacing:'0.12em' }}>
                   {activeTab.toUpperCase()} · KNOWLEDGE GRAPH

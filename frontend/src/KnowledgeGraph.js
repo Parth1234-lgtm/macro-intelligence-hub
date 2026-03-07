@@ -288,7 +288,7 @@ export default function KnowledgeGraph({ data, sector }) {
   }, [data, sector]);
 
   return (
-    <div ref={containerRef} style={{ position:'relative', overflowX:'auto' }}>
+    <div ref={containerRef} style={{ position:'relative', overflowX:'auto', overflowY:'visible' }}>
       <svg ref={svgRef} style={{ display:'block', overflow:'visible' }}/>
       <div ref={tipRef} style={{
         position:'absolute', pointerEvents:'none', opacity:0,
