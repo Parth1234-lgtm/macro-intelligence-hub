@@ -4,54 +4,79 @@ import KnowledgeGraph from './KnowledgeGraph';
 const SECTORS = ['Stocks', 'Real Estate', 'Crypto'];
 
 const SECTOR_META = {
-  Stocks:        { icon: '📈', accent: '#2196f3', dim: '#0d2137' },
-  'Real Estate': { icon: '🏢', accent: '#818cf8', dim: '#0d0f37' },
-  Crypto:        { icon: '₿',  accent: '#f59e0b', dim: '#1a1000' },
+  Stocks:        { icon: '📈', accent: '#6ee7f7', grad: 'linear-gradient(135deg,#0f2a3f,#0a1628)', tag: 'EQ' },
+  'Real Estate': { icon: '🏢', accent: '#a78bfa', grad: 'linear-gradient(135deg,#1a0f3f,#0a0a28)', tag: 'RE' },
+  Crypto:        { icon: '₿',  accent: '#fbbf24', grad: 'linear-gradient(135deg,#2a1a00,#120c00)', tag: 'CR' },
 };
 
-const SEVERITY_COLOR = {
-  Critical: '#ff2d55', High: '#ff6b35', Medium: '#ffd166', Low: '#06d6a0',
-};
+const SEV_COLOR = { Critical:'#f43f5e', High:'#fb923c', Medium:'#facc15', Low:'#34d399' };
 
-const DAY_COLORS = ['#2196f3', '#a78bfa', '#f59e0b'];
-
-function StatBadge({ label, value, color }) {
+function Pill({ color, children }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <span style={{ fontSize: 9, color: '#475569', letterSpacing: '0.15em' }}>{label}</span>
-      <span style={{ fontSize: 20, fontFamily: 'Syne', fontWeight: 800, color: color || '#e2e8f0' }}>{value}</span>
+    <span style={{
+      fontSize: 10, padding: '3px 10px', borderRadius: 20,
+      background: `${color}18`, border: `1px solid ${color}50`,
+      color, fontFamily: 'JetBrains Mono', letterSpacing: '0.05em',
+    }}>{children}</span>
+  );
+}
+
+function StatCard({ label, value, color, sub }) {
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:4, minWidth:70 }}>
+      <span style={{ fontSize:10, color:'#475569', fontFamily:'Inter', letterSpacing:'0.08em', textTransform:'uppercase' }}>{label}</span>
+      <span style={{ fontSize:28, fontFamily:'Outfit', fontWeight:800, color: color||'#f1f5f9', lineHeight:1 }}>{value}</span>
+      {sub && <span style={{ fontSize:9, color:'#334155', fontFamily:'JetBrains Mono' }}>{sub}</span>}
     </div>
   );
 }
 
 function LoadingPipeline({ sector }) {
-  const steps = ['INGESTING NEWS', 'CLASSIFYING THEMES', 'DETECTING HEAT', 'GENERATING RISKS', 'BUILDING GRAPH'];
+  const steps = ['Ingesting', 'Classifying', 'Heat Detection', 'Risk Analysis', 'Graph Build'];
   const [step, setStep] = useState(0);
   useEffect(() => {
-    const iv = setInterval(() => setStep(s => (s + 1) % steps.length), 1100);
+    const iv = setInterval(() => setStep(s => (s + 1) % steps.length), 900);
     return () => clearInterval(iv);
   }, []);
+  const meta = SECTOR_META[sector];
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 580, gap: 24 }}>
-      <div style={{ fontSize: 11, color: '#475569', letterSpacing: '0.3em' }}>RUNNING 3-DAY PIPELINE · {sector.toUpperCase()}</div>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:500, gap:32 }}>
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8 }}>
+        <span style={{ fontSize:11, color:'#475569', fontFamily:'JetBrains Mono', letterSpacing:'0.2em' }}>RUNNING AI PIPELINE</span>
+        <span style={{ fontSize:22, fontFamily:'Outfit', fontWeight:700, color: meta.accent }}>{sector.toUpperCase()}</span>
+      </div>
+
+      {/* animated pipeline steps */}
+      <div style={{ display:'flex', alignItems:'center', gap:0 }}>
         {steps.map((s, i) => (
-          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div key={s} style={{ display:'flex', alignItems:'center' }}>
             <div style={{
-              padding: '5px 10px', fontSize: 8, letterSpacing: '0.1em', fontFamily: 'Space Mono',
-              background: i === step ? '#0d2547' : '#080d16',
-              border: `1px solid ${i === step ? '#2196f3' : '#1e3a5f'}`,
-              color: i === step ? '#60a5fa' : '#334155',
-              transition: 'all 0.3s',
+              padding:'8px 16px', fontSize:10, fontFamily:'JetBrains Mono',
+              background: i === step ? `${meta.accent}18` : '#0a0f1a',
+              border: `1px solid ${i === step ? meta.accent : '#1a2535'}`,
+              color: i === step ? meta.accent : '#2a3a4a',
+              borderRadius: i===0?'8px 0 0 8px':i===steps.length-1?'0 8px 8px 0':'0',
+              transition:'all 0.4s',
+              boxShadow: i===step ? `0 0 20px ${meta.accent}30` : 'none',
             }}>{s}</div>
-            {i < steps.length - 1 && <span style={{ color: '#1e3a5f' }}>→</span>}
+            {i < steps.length-1 && (
+              <div style={{ width:1, height:36, background: i < step ? `${meta.accent}60` : '#1a2535' }} />
+            )}
           </div>
         ))}
       </div>
-      <div style={{ fontSize: 9, color: '#334155', letterSpacing: '0.2em' }}>PROCESSING DAY 1 → DAY 2 → DAY 3 SEQUENTIALLY...</div>
-      <div style={{ display: 'flex', gap: 6 }}>
-        {[0,1,2].map(i => <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#2196f3', animation: `pulse ${0.6 + i * 0.2}s infinite` }} />)}
+
+      <div style={{ display:'flex', gap:8 }}>
+        {[0,1,2,3].map(i => (
+          <div key={i} style={{
+            width:6, height:6, borderRadius:'50%',
+            background: meta.accent,
+            animation:`dotpulse 1.2s ${i*0.15}s ease-in-out infinite`,
+            opacity: 0.3,
+          }}/>
+        ))}
       </div>
+      <style>{`@keyframes dotpulse{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}`}</style>
     </div>
   );
 }
@@ -78,139 +103,202 @@ export default function App() {
   };
 
   useEffect(() => { fetchSector('Stocks'); }, []);
+  const handleTab = (s) => { setActiveTab(s); fetchSector(s); };
 
-  const handleTab = (sector) => { setActiveTab(sector); fetchSector(sector); };
-
-  const d = sectorData[activeTab];
+  const d    = sectorData[activeTab];
   const meta = SECTOR_META[activeTab];
-
-  const confirmedRisks = d ? d.risks.filter(r => r.confirmed) : [];
+  const confirmed = d ? d.risks.filter(r => r.confirmed) : [];
 
   return (
-    <div style={{ fontFamily: "'Space Mono', monospace", background: '#05080f', minHeight: '100vh', color: '#e2e8f0' }}>
+    <div style={{ fontFamily:"'Inter',sans-serif", background:'#060a12', minHeight:'100vh', color:'#e2e8f0' }}>
       <style>{`
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes confirmPulse { 0%,100%{box-shadow:0 0 6px #00ff8860} 50%{box-shadow:0 0 18px #00ff88} }
+        * { box-sizing: border-box }
+        @keyframes fadein { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes glow   { 0%,100%{box-shadow:0 0 8px #6ee7f730} 50%{box-shadow:0 0 24px #6ee7f760} }
+        @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:0.3} }
         ::-webkit-scrollbar{width:4px;height:4px}
-        ::-webkit-scrollbar-track{background:#05080f}
+        ::-webkit-scrollbar-track{background:#060a12}
         ::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:2px}
       `}</style>
 
-      {/* Header */}
+      {/* ── Header ── */}
       <header style={{
-        background: 'linear-gradient(90deg,#080f1e,#05080f)',
-        borderBottom: '1px solid #0d1f38',
-        padding: '0 32px', display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', height: 58,
+        background: 'rgba(6,10,18,0.95)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #0f1f35',
+        padding: '0 36px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        height: 62, position: 'sticky', top: 0, zIndex: 50,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00e5ff', boxShadow: '0 0 10px #00e5ff', animation: 'pulse 2s infinite' }} />
-          <span style={{ fontFamily: 'Syne', fontWeight: 800, fontSize: 15, letterSpacing: '0.05em' }}>MACRO INTELLIGENCE HUB</span>
-          <span style={{ fontSize: 9, color: '#1e3a5f', letterSpacing: '0.2em' }}>// 3-DAY ROLLING ANALYSIS</span>
+        <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+          <div style={{
+            width:32, height:32, borderRadius:8,
+            background: 'linear-gradient(135deg,#6ee7f7,#3b82f6)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:14, boxShadow:'0 0 16px #6ee7f740',
+          }}>◈</div>
+          <div>
+            <div style={{ fontFamily:'Outfit', fontWeight:700, fontSize:16, letterSpacing:'0.02em', color:'#f1f5f9' }}>
+              Macro Intelligence Hub
+            </div>
+            <div style={{ fontSize:10, color:'#334155', fontFamily:'JetBrains Mono', letterSpacing:'0.1em' }}>
+              3-DAY ROLLING RISK ENGINE
+            </div>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 20, fontSize: 9, color: '#334155', letterSpacing: '0.1em' }}>
-          <span style={{ color: '#00ff88' }}>✅ CONFIRMED RISK</span>
+
+        <div style={{ display:'flex', gap:16, alignItems:'center' }}>
+          <Pill color="#6ee7f7">● LIVE</Pill>
+          <Pill color="#00ff88">✓ CONFIRMS ACTIVE</Pill>
+          <Pill color="#fbbf24">⚡ AI PIPELINE</Pill>
         </div>
       </header>
 
-      {/* Tabs */}
-      <div style={{ borderBottom: '1px solid #0d1f38', padding: '0 32px', display: 'flex', background: '#080d16' }}>
+      {/* ── Sector Tabs ── */}
+      <div style={{ background:'#080d18', borderBottom:'1px solid #0f1f35', padding:'0 36px', display:'flex', gap:4 }}>
         {SECTORS.map(sector => {
           const m = SECTOR_META[sector];
-          const isActive = activeTab === sector;
           const sd = sectorData[sector];
-          const confirmed = sd ? sd.risks.filter(r => r.confirmed).length : 0;
+          const conf = sd ? sd.risks.filter(r=>r.confirmed).length : 0;
+          const isActive = activeTab === sector;
           return (
             <button key={sector} onClick={() => handleTab(sector)} style={{
-              background: isActive ? '#0d1f38' : 'transparent',
-              border: 'none', borderBottom: isActive ? `2px solid ${m.accent}` : '2px solid transparent',
+              background: isActive ? `${m.accent}0f` : 'transparent',
+              border: 'none',
+              borderBottom: `2px solid ${isActive ? m.accent : 'transparent'}`,
               color: isActive ? m.accent : '#475569',
-              padding: '15px 28px', fontSize: 11, letterSpacing: '0.15em',
-              fontFamily: 'Space Mono', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 8, transition: 'all 0.2s',
+              padding: '16px 24px', fontSize: 12, letterSpacing: '0.08em',
+              fontFamily: 'Inter', fontWeight: 600,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
+              transition: 'all 0.2s',
             }}>
-              {m.icon} {sector.toUpperCase()}
-              {sd && <span style={{ fontSize: 8, padding: '1px 6px', background: m.dim, border: `1px solid ${m.accent}`, color: m.accent }}>{sd.risks?.length} RISKS</span>}
-              {confirmed > 0 && <span style={{ fontSize: 8, padding: '1px 6px', background: '#001a0d', border: '1px solid #00ff88', color: '#00ff88' }}>✅ {confirmed}</span>}
-              {loading[sector] && <span style={{ width: 5, height: 5, borderRadius: '50%', background: m.accent, animation: 'pulse 0.5s infinite', display: 'inline-block' }} />}
+              <span>{m.icon}</span>
+              <span>{sector}</span>
+              {sd && (
+                <span style={{
+                  fontSize:9, padding:'2px 7px', borderRadius:10,
+                  background:`${m.accent}18`, border:`1px solid ${m.accent}40`,
+                  color:m.accent, fontFamily:'JetBrains Mono',
+                }}>{sd.risks?.length} risks</span>
+              )}
+              {conf > 0 && (
+                <span style={{
+                  fontSize:9, padding:'2px 7px', borderRadius:10,
+                  background:'#00ff8818', border:'1px solid #00ff8840',
+                  color:'#00ff88', fontFamily:'JetBrains Mono',
+                }}>✓ {conf}</span>
+              )}
+              {loading[sector] && (
+                <span style={{ width:6, height:6, borderRadius:'50%', background:m.accent, display:'inline-block', animation:'pulse 0.5s infinite' }}/>
+              )}
             </button>
           );
         })}
       </div>
 
-      <main style={{ padding: '24px 32px', animation: 'fadeIn 0.4s ease' }}>
+      {/* ── Main ── */}
+      <main style={{ padding:'28px 36px', animation:'fadein 0.4s ease' }}>
 
         {loading[activeTab] && <LoadingPipeline sector={activeTab} />}
+
         {error[activeTab] && (
-          <div style={{ padding: 20, textAlign: 'center', color: '#ef4444', fontSize: 11 }}>
-            ERROR: {error[activeTab]} — Is the backend running on port 8000?
+          <div style={{ padding:24, textAlign:'center', color:'#f43f5e', fontSize:12, fontFamily:'JetBrains Mono', background:'#1a0810', border:'1px solid #f43f5e30', borderRadius:8 }}>
+            ✗ {error[activeTab]} — Backend may be waking up, retry in 30s
           </div>
         )}
 
         {d && !loading[activeTab] && (
-          <div style={{ animation: 'fadeIn 0.5s ease' }}>
+          <div style={{ animation:'fadein 0.5s ease', display:'flex', flexDirection:'column', gap:20 }}>
 
-            {/* Stats */}
-            <div style={{ display: 'flex', gap: 28, padding: '14px 22px', background: '#080d16', border: `1px solid ${meta.accent}20`, marginBottom: 20, flexWrap: 'wrap' }}>
-              <StatBadge label="EVENTS (3 DAYS)" value={d.events?.length} color={meta.accent} />
-              <div style={{ width: 1, background: '#0d1f38' }} />
-              <StatBadge label="THEMES" value={d.themes?.length} color="#00e5ff" />
-              <div style={{ width: 1, background: '#0d1f38' }} />
-              <StatBadge label="HOT 🔥" value={d.hot_themes?.length} color="#f59e0b" />
-              <div style={{ width: 1, background: '#0d1f38' }} />
-              <StatBadge label="RISKS" value={d.risks?.length} color="#ff2d55" />
-              <div style={{ width: 1, background: '#0d1f38' }} />
-              <StatBadge label="✅ CONFIRMED" value={confirmedRisks.length} color="#00ff88" />
-              <div style={{ width: 1, background: '#0d1f38' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <span style={{ fontSize: 9, color: '#475569', letterSpacing: '0.15em' }}>HOT THEMES</span>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {d.hot_themes?.map(t => (
-                    <span key={t} style={{ fontSize: 8, padding: '3px 8px', background: '#2d1200', border: '1px solid #ff6b35', color: '#ff6b35' }}>🔥 {t}</span>
-                  ))}
+            {/* Stats row */}
+            <div style={{
+              display:'flex', gap:0, background:'#080d18',
+              border:'1px solid #0f1f35', borderRadius:12, overflow:'hidden',
+            }}>
+              {[
+                { label:'Events', value:d.events?.length, color:meta.accent },
+                { label:'Themes', value:d.themes?.length, color:'#a78bfa' },
+                { label:'Hot 🔥', value:d.hot_themes?.length, color:'#fb923c' },
+                { label:'Risks', value:d.risks?.length, color:'#f43f5e' },
+                { label:'Confirmed ✓', value:confirmed.length, color:'#00ff88' },
+              ].map((s,i) => (
+                <div key={s.label} style={{
+                  flex:1, padding:'18px 24px',
+                  borderRight: i<4 ? '1px solid #0f1f35' : 'none',
+                  background: i===4 && confirmed.length>0 ? '#00ff8808' : 'transparent',
+                }}>
+                  <StatCard {...s} />
+                </div>
+              ))}
+              {/* Hot themes */}
+              <div style={{ flex:2, padding:'18px 24px', display:'flex', flexDirection:'column', gap:8, borderLeft:'1px solid #0f1f35' }}>
+                <span style={{ fontSize:10, color:'#475569', fontFamily:'Inter', letterSpacing:'0.08em', textTransform:'uppercase' }}>Hot Themes</span>
+                <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                  {d.hot_themes?.map(t => <Pill key={t} color="#fb923c">🔥 {t}</Pill>)}
                 </div>
               </div>
             </div>
 
-            {/* Confirmed risks alert banner */}
-            {confirmedRisks.length > 0 && (
-              <div style={{ marginBottom: 16, padding: '10px 18px', background: '#001a0d', border: '1px solid #00ff88', display: 'flex', gap: 12, alignItems: 'center', animation: 'confirmPulse 2s infinite' }}>
-                <span style={{ fontSize: 14 }}>✅</span>
-                <div>
-                  <div style={{ fontSize: 9, color: '#00ff88', letterSpacing: '0.2em', marginBottom: 3 }}>PREDICTED RISKS NOW CONFIRMED BY SUBSEQUENT EVENTS</div>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {confirmedRisks.map(r => (
-                      <span key={r.id} style={{ fontSize: 9, padding: '2px 8px', background: '#002a14', border: '1px solid #00ff8860', color: '#00ff88' }}>{r.name}</span>
+            {/* Confirmed alert */}
+            {confirmed.length > 0 && (
+              <div style={{
+                padding:'14px 20px', background:'#001a0d',
+                border:'1px solid #00ff8830', borderRadius:10,
+                display:'flex', gap:14, alignItems:'center',
+                boxShadow:'0 0 24px #00ff8815',
+              }}>
+                <div style={{ fontSize:20 }}>✓</div>
+                <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                  <span style={{ fontSize:11, color:'#00ff88', fontFamily:'JetBrains Mono', letterSpacing:'0.15em' }}>
+                    PREDICTED RISKS CONFIRMED BY SUBSEQUENT EVENTS
+                  </span>
+                  <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                    {confirmed.map(r => (
+                      <span key={r.id} style={{
+                        fontSize:10, padding:'3px 10px', borderRadius:20,
+                        background:'#002a14', border:'1px solid #00ff8850',
+                        color:'#00ff88', fontFamily:'JetBrains Mono',
+                      }}>{r.name}</span>
                     ))}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Knowledge Graph */}
-            <div style={{ background: '#07090f', border: `1px solid ${meta.accent}30`, marginBottom: 20 }}>
-              <div style={{ padding: '10px 18px', borderBottom: `1px solid ${meta.accent}20`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 9, letterSpacing: '0.2em', color: meta.accent }}>{activeTab.toUpperCase()} · 3-DAY KNOWLEDGE GRAPH</span>
-                <div style={{ display: 'flex', gap: 14, fontSize: 8, color: '#334155' }}>
-                  <span>● EVENTS</span>
-                  <span style={{ color: '#00e5ff' }}>◆ THEMES</span>
-                  <span style={{ color: '#ff2d55' }}>■ RISKS</span>
-                  <span style={{ color: '#00ff88' }}>— CONFIRMS</span>
-                  <span style={{ color: '#ff6b3580' }}>--- IMPLIES</span>
-                  <span style={{ color: '#2196f330' }}>— TRIGGERS</span>
+            {/* Graph */}
+            <div style={{
+              background:'#070b14',
+              border:`1px solid ${meta.accent}25`,
+              borderRadius:12, overflow:'hidden',
+            }}>
+              {/* Graph header */}
+              <div style={{
+                padding:'12px 20px',
+                borderBottom:`1px solid ${meta.accent}15`,
+                display:'flex', justifyContent:'space-between', alignItems:'center',
+                background:`${meta.accent}06`,
+              }}>
+                <span style={{ fontSize:11, color:meta.accent, fontFamily:'JetBrains Mono', letterSpacing:'0.15em', fontWeight:500 }}>
+                  {activeTab.toUpperCase()} · 3-DAY KNOWLEDGE GRAPH
+                </span>
+                <div style={{ display:'flex', gap:20, fontSize:10, fontFamily:'JetBrains Mono', alignItems:'center' }}>
+                  <span style={{ color:'#94a3b8' }}>● Event</span>
+                  <span style={{ color:'#a78bfa' }}>◆ Theme</span>
+                  <span style={{ color:'#f43f5e' }}>■ Risk</span>
+                  <span style={{ color:'#00ff88' }}>⤻ Confirms</span>
+                  <span style={{ color:'#fb923c60' }}>--- Implies</span>
                 </div>
               </div>
-              <KnowledgeGraph data={d} sector={activeTab} />
+              <KnowledgeGraph data={d} sector={activeTab} accentColor={meta.accent} />
             </div>
-
-
 
           </div>
         )}
 
         {!loading[activeTab] && !d && !error[activeTab] && (
-          <div style={{ textAlign: 'center', padding: 60, color: '#1e3a5f', fontSize: 11, letterSpacing: '0.2em' }}>AWAITING PIPELINE RUN</div>
+          <div style={{ textAlign:'center', padding:80, color:'#1e3a5f', fontSize:12, fontFamily:'JetBrains Mono', letterSpacing:'0.2em' }}>
+            AWAITING PIPELINE RUN
+          </div>
         )}
       </main>
     </div>
