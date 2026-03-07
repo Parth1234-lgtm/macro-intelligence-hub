@@ -23,7 +23,7 @@ export default function KnowledgeGraph({ data, sector }) {
     const H = TOP_PAD + GRAPH_H + BOT_PAD;
     const MID = TOP_PAD + GRAPH_H / 2;
     const CYCLE = (W - 80) / N;
-    const ARC_Y = 24; // arc peaks here (absolute Y in SVG)
+    const ARC_Y = 20; // arc peaks here (absolute Y in SVG)
 
     d3.select(svgRef.current).selectAll('*').remove();
     const svg = d3.select(svgRef.current)
@@ -132,27 +132,27 @@ export default function KnowledgeGraph({ data, sector }) {
       // Cubic bezier arcing UP above the graph
       const pathD = `M${s.x},${s.y} C${s.x},${ARC_Y} ${t.x},${ARC_Y} ${t.x},${t.y}`;
 
-      // Layer 1: big soft outer glow
+      // Layer 1: huge outer glow
       confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',20)
-        .attr('opacity',.04)
+        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',28)
+        .attr('opacity',.18)
         .style('animation','cg 2.5s ease-in-out infinite');
 
       // Layer 2: medium glow
       confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',7)
-        .attr('opacity',.1)
+        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',10)
+        .attr('opacity',.45)
         .style('animation','cg 2.5s ease-in-out infinite .2s');
 
-      // Layer 3: core line
+      // Layer 3: core solid bright line
       confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',2)
-        .attr('opacity',.4)
+        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',3)
+        .attr('opacity',1)
         .style('animation','cg 2.5s ease-in-out infinite .4s');
 
       // Layer 4: marching dashes on top
       confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',2)
+        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',3)
         .attr('stroke-dasharray','10 6')
         .attr('marker-end',`url(#aC${sector})`)
         .style('animation','cg 2.5s ease-in-out infinite, march 1s linear infinite');
