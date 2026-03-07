@@ -67,6 +67,21 @@ export default function KnowledgeGraph({ data, sector }) {
     mkArrow(`aI${sector}`,'#fb923c50',4);
     mkArrow(`aC${sector}`,'#00ff88',7);
 
+    // Glowing green arrow marker for confirms arcs
+    const confirmArrow = defs.append('marker').attr('id',`aCGlow${sector}`)
+      .attr('viewBox','0 -6 14 12').attr('refX',8).attr('refY',0)
+      .attr('markerWidth',14).attr('markerHeight',14).attr('orient','auto');
+    // Glow layer
+    confirmArrow.append('path')
+      .attr('d','M0,-5L12,0L0,5Z')
+      .attr('fill','#00ff88')
+      .attr('filter',`url(#gC${sector})`)
+      .attr('opacity',0.6);
+    // Core arrow
+    confirmArrow.append('path')
+      .attr('d','M0,-5L12,0L0,5Z')
+      .attr('fill','#00ff88');
+
     // ── Node positions ────────────────────────────────────────────────────
     const nm = {};
     days.forEach((date, di) => {
@@ -123,51 +138,103 @@ export default function KnowledgeGraph({ data, sector }) {
         .attr('marker-end',`url(#${isI?'aI':'aT'}${sector})`);
     });
 
-    // ── CONFIRMATION ARCS — glowing green above the graph ─────────────────
+    // ── CONFIRMATION ARCS — light dotted green arc from confirmed risk to confirming event ─────────────────
     const confirmG = svg.append('g');
-    graph_edges.filter(e=>e.type==='confirms').forEach(edge => {
-      const s = nm[edge.from], t = nm[edge.to];
-      if (!s||!t) return;
-
+    
+    // Helper to draw a confirmation arc (from risk FORWARD to event on the right)
+    const drawConfirmArc = (riskNode, eventNode, arcIndex = 0) => {
+      // DOUBLE CHECK: Only draw if risk is confirmed (green box with checkmark)
+      if (!riskNode.confirmed) return;
+      // Only draw if event is to the RIGHT of the risk (forward in time)
+      if (eventNode.x <= riskNode.x) return;
+      
+      // Arc from the confirmed risk (left) to the confirming event (right)
+      const startX = riskNode.x;
+      const startY = riskNode.y - 29; // Top of risk box
+      const endX = eventNode.x;
+      const endY = eventNode.y - 17; // Top of event circle
+      
+      const midX = (startX + endX) / 2;
+      // Offset arc height slightly for multiple arcs
+      const arcY = ARC_Y + arcIndex * 20;
+      
       // Cubic bezier arcing UP above the graph
-      const pathD = `M${s.x},${s.y} C${s.x},${ARC_Y} ${t.x},${ARC_Y} ${t.x},${t.y}`;
+      const pathD = `M${startX},${startY} C${startX},${arcY} ${endX},${arcY} ${endX},${endY}`;
 
-      // Layer 1: huge outer glow
+      // Layer 1: subtle outer glow (very light)
       confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',28)
-        .attr('opacity',.18)
-        .style('animation','cg 2.5s ease-in-out infinite');
+        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',8)
+        .attr('opacity',.08);
 
-      // Layer 2: medium glow
+      // Layer 2: dotted line (main visible arc)
       confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',10)
-        .attr('opacity',.45)
-        .style('animation','cg 2.5s ease-in-out infinite .2s');
+        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',1.5)
+        .attr('stroke-dasharray','6 4')
+        .attr('opacity',.7)
+        .style('animation','march 1.5s linear infinite');
 
-      // Layer 3: core solid bright line
-      confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',3)
-        .attr('opacity',1)
-        .style('animation','cg 2.5s ease-in-out infinite .4s');
+      // Small arrow at the end pointing down toward event
+      const arrowSize = 8;
+      confirmG.append('path')
+        .attr('d', `M${endX-arrowSize/2},${endY-arrowSize-2} L${endX},${endY-2} L${endX+arrowSize/2},${endY-arrowSize-2}`)
+        .attr('fill','none')
+        .attr('stroke','#00ff88')
+        .attr('stroke-width',2)
+        .attr('stroke-linecap','round')
+        .attr('stroke-linejoin','round')
+        .attr('opacity',.8);
 
-      // Layer 4: marching dashes on top
-      confirmG.append('path').attr('d',pathD)
-        .attr('fill','none').attr('stroke','#00ff88').attr('stroke-width',3)
-        .attr('stroke-dasharray','10 6')
-        .attr('marker-end',`url(#aC${sector})`)
-        .style('animation','cg 2.5s ease-in-out infinite, march 1s linear infinite');
+      // Small circle at the START of arc to show origin point
+      confirmG.append('circle')
+        .attr('cx', startX)
+        .attr('cy', startY)
+        .attr('r', 4)
+        .attr('fill', '#00ff88')
+        .attr('opacity', 0.9);
 
-      // CONFIRMS pill at apex
-      const midX = (s.x+t.x)/2;
+      // CONFIRMS pill at apex of arc
       confirmG.append('rect')
-        .attr('x',midX-34).attr('y',ARC_Y-11)
-        .attr('width',68).attr('height',19).attr('rx',9.5)
-        .attr('fill','#0a120a').attr('stroke','#00ff8860').attr('stroke-width',1);
+        .attr('x',midX-30).attr('y',arcY-9)
+        .attr('width',60).attr('height',16).attr('rx',8)
+        .attr('fill','#0a120a').attr('stroke','#00ff8850').attr('stroke-width',1);
       confirmG.append('text')
-        .attr('x',midX).attr('y',ARC_Y+3)
+        .attr('x',midX).attr('y',arcY+2)
         .attr('text-anchor','middle').attr('font-family','JetBrains Mono')
-        .attr('font-size',8).attr('fill','#00ff88').attr('letter-spacing',2)
+        .attr('font-size',7).attr('fill','#00ff88').attr('letter-spacing',1.5).attr('opacity',.8)
         .text('CONFIRMS');
+    };
+    
+    // Draw arcs ONLY from the green confirmed risk boxes (with checkmark) to confirming events
+    // Use the SAME data source as the risk box rendering to ensure consistency
+    const riskNodes = Object.values(nm).filter(n => n.type === 'risk');
+    const drawnRiskIds = new Set();
+    let arcIndex = 0;
+    
+    // Only draw from nodes that are rendered as green (have checkmark badge)
+    // This matches the condition: rG.filter(d=>d.confirmed) used for the checkmark
+    riskNodes.forEach(riskNode => {
+      // EXACT same check as the green box rendering
+      if (!riskNode.confirmed) return;
+      if (drawnRiskIds.has(riskNode.id)) return;
+      
+      // Find the nearest event to the RIGHT of this risk
+      let bestEvent = null;
+      let bestDistance = Infinity;
+      
+      Object.values(nm).filter(n => n.type === 'event').forEach(eNode => {
+        // Must be to the right
+        if (eNode.x <= riskNode.x) return;
+        const dist = eNode.x - riskNode.x;
+        if (dist < bestDistance) {
+          bestDistance = dist;
+          bestEvent = eNode;
+        }
+      });
+      
+      if (bestEvent) {
+        drawnRiskIds.add(riskNode.id);
+        drawConfirmArc(riskNode, bestEvent, arcIndex++);
+      }
     });
 
     // ── Event nodes ───────────────────────────────────────────────────────
