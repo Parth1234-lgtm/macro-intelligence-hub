@@ -3,7 +3,7 @@ import KnowledgeGraph from './KnowledgeGraph';
 import ScenarioLab from './ScenarioLab';
 import WorldMapDashboard from './WorldMapDashboard';
 
-const API = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API = process.env.REACT_APP_API_URL || 'https://macro-intelligence-hub.onrender.com';
 
 const C = {
   parchment:   '#F5EFE4',
