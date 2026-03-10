@@ -10,7 +10,7 @@
 
 ## What It Does
 
-The Macro Intelligence Hub ingests macro news across three geographies (US, India, China) and three asset classes (Equities, Real Estate, Digital Assets), runs it through a 5-node LangGraph AI pipeline, and produces an interactive knowledge graph showing which themes are heating up, which risks are confirmed, and how global events connect to portfolio exposure.
+The Macro Intelligence Hub ingests macro news across three geographies (US, India, China) and three asset classes (Equities, Real Estate, Digital Assets), runs it through a LangGraph Agentic AI pipeline, and produces an interactive knowledge graph showing which themes are heating up, which risks are confirmed, and how global events connect to portfolio exposure.
 
 Instead of manually reading hundreds of articles, portfolio managers get a real-time visual map of macro risk — in seconds.
 
@@ -59,6 +59,16 @@ Select macro themes and write custom conditions to simulate hypothetical risk sc
 **📋 Risk Register**  
 Structured list of all identified risks with severity badges (CRITICAL / HIGH / MODERATE), confirmation status, asset class tags, and triggering events for full traceability.
 
+**⚡ Real-Time AI Inference**  
+Powered by Groq (Llama 3.3 70B) — sub-second LLM responses mean the full 
+5-node pipeline completes in seconds, not minutes. No waiting, no batch 
+processing — live intelligence on demand.
+
+**🎯 Built for Everyone**  
+No finance degree required. The knowledge graph, heat scores, and risk register 
+are designed to be understood at a glance — whether you're a portfolio manager 
+at a fund or a self-directed investor managing your own money.
+
 ---
 
 ## Tech Stack
@@ -77,9 +87,21 @@ Structured list of all identified risks with severity badges (CRITICAL / HIGH / 
 
 ## Market Potential
 
-Global AUM exceeds $100 trillion. Every major asset manager employs macro research teams doing manually what this platform does automatically. Target users include tier-1 asset managers, macro hedge funds, sovereign wealth funds, and investment bank research divisions.
+The opportunity operates on two levels:
 
-The platform is designed to augment human analysts — surfacing connections and heat signals faster than any manual process, while keeping humans in control of final investment decisions.
+**Institutional** — Global AUM exceeds $100 trillion. Every major asset manager, 
+macro hedge fund, and sovereign wealth fund employs research teams doing manually 
+what this platform does automatically.
+
+**Retail** — Over 100 million self-directed retail investors globally make portfolio 
+decisions with no access to the macro intelligence that institutions take for granted. 
+A Fed rate decision, a property crisis, a crypto rally — retail investors feel the 
+impact but rarely understand the connections in time to act.
+
+The Macro Intelligence Hub bridges that gap — giving everyday investors the same 
+real-time macro signal detection that was previously only available to billion-dollar 
+research desks. Democratising institutional-grade intelligence is not just a feature, 
+it is the mission.
 
 ---
 
