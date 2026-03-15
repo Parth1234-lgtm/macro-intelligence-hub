@@ -237,7 +237,7 @@ function AnalysisDashboard({ initialCountry, onBackToMap }) {
           }}>◈</div>
           <div>
             <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: 18, color: C.warmWhite }}>Macro Intelligence Hub</div>
-            <div style={{ fontSize: 9, color: `${C.leaf}CC`, fontFamily: "'DM Mono', monospace", letterSpacing: '0.14em' }}>WEALTH WELLNESS ENGINE · SCHRODERS</div>
+            <div style={{ fontSize: 9, color: `${C.leaf}CC`, fontFamily: "'DM Mono', monospace", letterSpacing: '0.14em' }}>WEALTH WELLNESS ENGINE </div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
